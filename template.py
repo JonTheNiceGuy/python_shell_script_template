@@ -35,7 +35,6 @@ class Colours:
     BOLD_CYAN = '\033[36m\033[m'
 
     def __init__(self, nocolour: bool = False):
-        os.system("")
         self.nocolour(nocolour)
 
     def nocolour(self, nocolour: bool = False):
@@ -86,7 +85,7 @@ class RunCommand:
             for env_item in env.keys():
                 self.running_env[env_item] = env[env_item]
 
-        logging.debug(f'exec: {" ".join(command)}')
+        logger.debug(f'exec: {" ".join(command)}')
 
         try:
             result = subprocess.run(
@@ -109,11 +108,11 @@ class RunCommand:
 
         # If verbose mode is on, output the results and errors from the command execution
         if len(self.stdout) > 0:
-            logging.debug(
+            logger.debug(
                 f'{colours.BOLD_GREEN}stdout:{colours.RESET}{colours.GREEN} {self.list_to_newline_string(self.stdout)}{colours.RESET}'
             )
         if len(self.stderr) > 0:
-            logging.debug(
+            logger.debug(
                 f'{colours.BOLD_RED}stderr:{colours.RESET}{colours.RED} {self.list_to_newline_string(self.stderr)}{colours.RESET}'
             )
 
@@ -149,9 +148,8 @@ class RunCommand:
 
 
 # Set defaults here
-logging.basicConfig(level=logging.INFO)
+logger = logging
 colours = Colours()
-
 # Main processes here
 
 
@@ -159,6 +157,10 @@ def main():
     args = process_args()
 
     print(f'Hello {args.who}')
+
+    get_date = RunCommand(['date'])
+
+    print("\n".join(get_date.stdout))
 
 # Functions to support main()
 
@@ -188,8 +190,10 @@ def process_args():
     args = parser.parse_args()
 
     if args.verbose:
-        logging.setLevel(logging.DEBUG)
-        logging.debug('Setting verbose mode on')
+        logger.basicConfig(level=logging.DEBUG)
+        logger.debug('Setting verbose mode on')
+    else:
+        logger.basicConfig(level=logging.INFO)
 
     colours.nocolour(args.nocolour)
 
